@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html>
+      <head>
+        <title>Leaflet Web Map</title>
+        <!--I have them local but using them online-->
+        <link rel="stylesheet" href="https://unpkg.com/leaflet@1.2.0/dist/leaflet.css" />
+        <link rel="stylesheet" href="https://unpkg.com/leaflet-routing-machine@latest/dist/leaflet-routing-machine.css" />
+        <script src="https://unpkg.com/leaflet@1.2.0/dist/leaflet.js"></script>
+        <script src="https://unpkg.com/leaflet-routing-machine@latest/dist/leaflet-routing-machine.js"></script>
+        
+        <style>
+          #map {
+            width: 960px;
+            height: 500px;
+          }
+        </style>
+      </head>
+
+      <body>
+        <div id="map"></div>
+        <script>
+
+          var map = L.map('map',{
+            center: [37.276921,49.586964],
+            zoom: 15
+          });
+
+          L.tileLayer('http://{s}.tile.osm.org/{z}/{x}/{y}.png', {
+            attribution: '&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors',
+            maxZoom: 18,
+            id: 'mapbox.streets',
+          }).addTo(map);
+          
+          L.Routing.control({
+            waypoints: [
+              L.latLng(37.275086, 49.588326),
+              L.latLng(37.271201, 49.592113),
+              //L.latLng(37.268811, 49.597199),
+              //L.latLng(37.270655, 49.60207),
+              
+            ]
+          }).addTo(map);
+        </script>
+    </body>
+</html>
