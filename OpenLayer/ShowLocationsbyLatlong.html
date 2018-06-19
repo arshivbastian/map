@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Icon Colors</title>
+    <link rel="stylesheet" href="https://openlayers.org/en/v4.6.5/css/ol.css" type="text/css">
+    <!-- The line below is only needed for old environments like Internet Explorer and Android 4.x -->
+    <script src="https://cdn.polyfill.io/v2/polyfill.min.js?features=requestAnimationFrame,Element.prototype.classList,URL"></script>
+    <script src="https://openlayers.org/en/v4.6.5/build/ol.js"></script>
+    <style>
+      #map {
+        position: relative;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="map" class="map"></div>
+    <script>
+      //for showing the locations with an icon we have to use them as an feature , you can find locations from : http://www.mapcoordinates.net/en
+      var loc1 = new ol.Feature({
+        geometry: new ol.geom.Point(ol.proj.fromLonLat([49.64941358, 37.28418457]))
+      });
+      var loc2 = new ol.Feature({
+        geometry: new ol.geom.Point(ol.proj.fromLonLat([49.64263295, 37.28623326]))
+      });
+      var loc3 = new ol.Feature({
+        geometry: new ol.geom.Point(ol.proj.fromLonLat([49.61997365, 37.28438944]))
+      });
+
+      //for the icones we have to use style below (the src has to be a link)
+      loc1.setStyle(new ol.style.Style({
+        image: new ol.style.Icon(/** @type {olx.style.IconOptions} */ ({
+          color: '#8959A8',
+          crossOrigin: 'anonymous',
+          src: 'https://openlayers.org/en/v4.6.5/examples/data/dot.png'
+        }))
+      }));
+      loc2.setStyle(new ol.style.Style({
+        image: new ol.style.Icon(/** @type {olx.style.IconOptions} */ ({
+          color: '#4271AE',
+          crossOrigin: 'anonymous',
+          src: 'https://openlayers.org/en/v4.6.5/examples/data/dot.png'
+        }))
+      }));
+      loc3.setStyle(new ol.style.Style({
+        image: new ol.style.Icon(/** @type {olx.style.IconOptions} */ ({
+          color: [113, 140, 0],
+          crossOrigin: 'anonymous',
+          src: 'https://openlayers.org/en/v4.6.5/examples/data/dot.png'
+        }))
+      }));
+
+      // for showing all location features with their styles we need to collect them as a vector source 
+      var vectorSource = new ol.source.Vector({
+        features: [loc1, loc2, loc3]
+      });
+
+      // vector layer use vector source stuffs to show them on map div
+      var vectorLayer = new ol.layer.Vector({
+        source: vectorSource
+      });
+      
+      // for using both OSM and the custom layer we build on the map div we have to add OSM to another layer
+      var rasterLayer = new ol.layer.Tile({
+        source: new ol.source.OSM()
+      });
+
+
+      var map = new ol.Map({
+        //the map div has to show both location features (custom layer) and the OSM 
+        layers: [rasterLayer, vectorLayer],
+        target: document.getElementById('map'),
+        // here we cant use the location feature as center cause they are not variances 
+        view: new ol.View({
+          center: ol.proj.fromLonLat([49.61997365, 37.28438944]) ,
+          zoom: 14 
+        })
+      });
+    </script>
+  </body>
+</html>

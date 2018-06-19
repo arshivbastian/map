@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>View Animation</title>
+    <link rel="stylesheet" href="https://openlayers.org/en/v4.6.5/css/ol.css" type="text/css">
+    <!-- The line below is only needed for old environments like Internet Explorer and Android 4.x -->
+    <script src="https://cdn.polyfill.io/v2/polyfill.min.js?features=requestAnimationFrame,Element.prototype.classList,URL"></script>
+    <script src="https://openlayers.org/en/v4.6.5/build/ol.js"></script>
+  </head>
+  <body>
+    <div id="map" class="map"></div>
+    
+    <button id="pan-to-loc1">Pan to loc1</button>
+    <button id="pan-to-loc2">pan to loc2</button>
+    
+    <script>
+      //we have two locations you can get latlong from : http://www.mapcoordinates.net/en
+      var loc1 = ol.proj.fromLonLat([49.63092285, 37.28518955]);
+      var loc2 = ol.proj.fromLonLat([49.62375598, 37.28464323]);
+     
+     //the view use to show a place in world map
+      var view = new ol.View({
+        //here cause the loc1 and loc2 are variance we can add the as center (if there were location feature point we couldn't)
+        center: loc1,
+        zoom: 15
+      });
+
+      //we target the div with both class and id map and laters source is connected to OSM also we connect view to map
+      var map = new ol.Map({
+        target: 'map',
+        layers: [
+          new ol.layer.Tile({
+            preload: 4,
+            source: new ol.source.OSM()
+          })
+        ],
+        //this line is for animations (pan between two points)
+        loadTilesWhileAnimating: true,
+        view: view 
+      });
+
+      // this finction is important for animation (also we dont have map without it)
+      function bounce(t) {
+        var s = 7.5625, p = 2.75, l;
+        if (t < (1 / p)) {
+          l = s * t * t;
+        } else {
+          if (t < (2 / p)) {
+            t -= (1.5 / p);
+            l = s * t * t + 0.75;
+          } else {
+            if (t < (2.5 / p)) {
+              t -= (2.25 / p);
+              l = s * t * t + 0.9375;
+            } else {
+              t -= (2.625 / p);
+              l = s * t * t + 0.984375;
+            }
+          }
+        }
+        return l;
+      }
+
+      // this is the way animation works
+      function pan(t) {
+        return Math.pow(2, -10 * t) * Math.sin((t - 0.075) * (2 * Math.PI) / 0.3) + 1;
+      }
+      
+      // we need this line (no clue what is this)
+      function onClick(id, callback) {
+        document.getElementById(id).addEventListener('click', callback);
+      }
+
+      // by click on the button in body animation will run and goes to location 1 (consider for defult we are in loc1)
+      onClick('pan-to-loc1', function() {
+        view.animate({
+          center: loc1,
+          duration: 2000
+        });
+      });
+      
+      // by click on the button in body animation will run and goes to location 2
+      onClick('pan-to-loc2', function() {
+        view.animate({
+          center: loc2,
+          duration: 2000
+        })
+      });
+
+      // this function is important for running map and animation
+      function flyTo(location, done) {
+        var duration = 2000;
+        var zoom = view.getZoom();
+        var parts = 2;
+        var called = false;
+        function callback(complete) {
+          --parts;
+          if (called) {
+            return;
+          }
+          if (parts === 0 || !complete) {
+            called = true;
+            done(complete);
+          }
+        }
+        view.animate({
+          center: location,
+          duration: duration
+        }, callback);
+        view.animate({
+          zoom: zoom - 1,
+          duration: duration / 2
+        }, {
+          zoom: zoom,
+          duration: duration / 2
+        }, callback);
+      }
+
+    </script>
+  </body>
+</html>
